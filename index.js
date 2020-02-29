@@ -27,8 +27,7 @@ let persons = [{
     }
 ]
 
-app.get('/', (request, response) => { <<
-    << << < HEAD
+app.get('/', (request, response) => {
     response.send('<h1>Hello World!</h1>')
 })
 
@@ -63,10 +62,7 @@ app.post('/api/persons', (request, response) => {
 
     persons = persons.concat(person)
 
-    response.json(person) ===
-        === =
-        response.send('<h1>Hello World!</h1>') >>>
-        >>> > 2991 fb0b698497b4be4800d23d60c2e2e732558c
+    response.json(person)
 })
 
 app.get('/api/persons', (request, response) => {
