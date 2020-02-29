@@ -27,7 +27,8 @@ let persons = [{
     }
 ]
 
-app.get('/', (request, response) => {
+app.get('/', (request, response) => { <<
+    << << < HEAD
     response.send('<h1>Hello World!</h1>')
 })
 
@@ -62,7 +63,10 @@ app.post('/api/persons', (request, response) => {
 
     persons = persons.concat(person)
 
-    response.json(person)
+    response.json(person) ===
+        === =
+        response.send('<h1>Hello World!</h1>') >>>
+        >>> > 2991 fb0b698497b4be4800d23d60c2e2e732558c
 })
 
 app.get('/api/persons', (request, response) => {
@@ -84,6 +88,11 @@ app.delete('/api/persons/:id', (request, response) => {
     persons = persons.filter(person => person.id !== id)
 
     response.status(204).end()
+})
+
+app.get('/info', (request, response) => {
+    const message = `<p>Phonebook has info for ${persons.length} people</p>` + (new Date().toString())
+    response.send(message)
 })
 
 app.get('/info', (request, response) => {
