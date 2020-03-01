@@ -23,6 +23,17 @@ app.post('/api/persons', (request, response) => {
         return response.status(400).json({
             error: 'name missing'
         })
+    } else {
+        Person.find({})
+            .then(persons => {
+                let copyOfNames = [...persons].map(person => person.name)
+                let index = copyOfNames.indexOf(body.newName)
+                if (index !== -1) {
+                    return response.status(400).json({
+                        error: 'name must be unique'
+                    })
+                }
+            })
     }
 
     if (!body.number) {
@@ -36,7 +47,9 @@ app.post('/api/persons', (request, response) => {
         number: body.number,
     })
 
-    person.save().then(savedPerson => response.json(savedPerson.toJSON()))
+    person.save()
+        .then(savedPerson => response.json(savedPerson.toJSON()))
+        .catch(error => next(error))
 })
 
 app.get('/api/persons', (request, response) => {
@@ -100,7 +113,10 @@ const errorHandler = (error, request, response, next) => {
     console.error(error.message)
     if (error.name === 'CastError' && error.kind === 'ObjectId') {
         return response.status(400).send({ error: 'malformatted id' })
+    } else if (error.name === 'ValidationError') {
+        return response.status(400).json({ error: error.message })
     }
+
     next(error)
 }
 
