@@ -24,15 +24,16 @@ app.post('/api/persons', (request, response) => {
         return response.status(400).json({
             error: 'name missing'
         })
-    } else {
-        let copyOfNames = [...persons].map(person => person.name)
-        let index = copyOfNames.indexOf(body.newName)
-        if (index !== -1) {
-            return response.status(400).json({
-                error: 'name must be unique'
-            })
-        }
     }
+    /*else {
+           let copyOfNames = [...persons].map(person => person.name)
+           let index = copyOfNames.indexOf(body.newName)
+           if (index !== -1) {
+               return response.status(400).json({
+                   error: 'name must be unique'
+               })
+           }
+       }*/
 
     if (!body.number) {
         return response.status(400).json({
@@ -40,15 +41,12 @@ app.post('/api/persons', (request, response) => {
         })
     }
 
-    const person = {
+    const person = new Person({
         name: body.name,
         number: body.number,
-        id: Math.ceil(Math.random() * Math.pow(10, 3))
-    }
+    })
 
-    persons = persons.concat(person)
-
-    response.json(person)
+    person.save().then(savedPerson => response.json(savedPerson.toJSON()))
 })
 
 app.get('/api/persons', (request, response) => {
