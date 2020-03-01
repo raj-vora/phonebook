@@ -1,9 +1,10 @@
 const express = require('express')
 const app = express()
-
+const morgan = require('morgan')
 const bodyParser = require('body-parser')
 
 app.use(bodyParser.json())
+app.use(morgan('tiny'))
 
 let persons = [{
         "name": "Arto Hellas",
@@ -84,11 +85,6 @@ app.delete('/api/persons/:id', (request, response) => {
     persons = persons.filter(person => person.id !== id)
 
     response.status(204).end()
-})
-
-app.get('/info', (request, response) => {
-    const message = `<p>Phonebook has info for ${persons.length} people</p>` + (new Date().toString())
-    response.send(message)
 })
 
 app.get('/info', (request, response) => {
