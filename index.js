@@ -12,16 +12,6 @@ morgan.token('body', function(req, res) { return JSON.stringify(req.body) })
 app.use(morgan(':method :url :status :res[content-length] - :response-time ms :body'))
 app.use(cors())
 
-const requestLogger = (request, response, next) => {
-    console.log('Method:', request.method)
-    console.log('Path:  ', request.path)
-    console.log('Body:  ', request.body)
-    console.log('---')
-    next()
-}
-
-app.use(requestLogger)
-
 app.get('/', (request, response) => {
     response.send('<h1>Hello World!</h1>')
 })
@@ -34,15 +24,6 @@ app.post('/api/persons', (request, response) => {
             error: 'name missing'
         })
     }
-    /*else {
-           let copyOfNames = [...persons].map(person => person.name)
-           let index = copyOfNames.indexOf(body.newName)
-           if (index !== -1) {
-               return response.status(400).json({
-                   error: 'name must be unique'
-               })
-           }
-       }*/
 
     if (!body.number) {
         return response.status(400).json({
@@ -62,6 +43,21 @@ app.get('/api/persons', (request, response) => {
     Person.find({}).then(persons => {
         response.json(persons.map(person => person.toJSON()))
     })
+})
+
+app.put('/api/persons/:id', (request, response, next) => {
+    const body = request.body
+
+    const person = {
+        name: body.name,
+        number: body.number
+    }
+
+    Person.findByIdAndUpdate(request.params.id, person, { new: true })
+        .then(updatedPerson => {
+            response.json(updatedPerson.toJSON())
+        })
+        .catch(error => next(error))
 })
 
 app.get('/api/persons/:id', (request, response, next) => {
@@ -85,8 +81,12 @@ app.delete('/api/persons/:id', (request, response, next) => {
 })
 
 app.get('/info', (request, response) => {
-    const message = `<p>Phonebook has info for ${persons.length} people</p>` + (new Date().toString())
-    response.send(message)
+    Person.find({})
+        .then(persons => {
+            const message = `<p>Phonebook has info for ${persons.length} people</p>` + (new Date().toString())
+            response.send(message)
+        })
+        .catch(error => next(error))
 })
 
 const unknownEndpoint = (request, response) => {
@@ -98,11 +98,9 @@ app.use(unknownEndpoint)
 
 const errorHandler = (error, request, response, next) => {
     console.error(error.message)
-
     if (error.name === 'CastError' && error.kind === 'ObjectId') {
         return response.status(400).send({ error: 'malformatted id' })
     }
-
     next(error)
 }
 
